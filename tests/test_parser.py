@@ -13,7 +13,6 @@ class TestNorma43Parser(unittest.TestCase):
         self.test_file = 'test_n43.txt'
         with open(self.test_file, 'w', encoding='latin-1') as f:
             # Header (11)
-            # Bank (4), Branch (4), Account (10), Start (6), End (6), InitBal (1 sign + 14 amt), Curr (3), Mode (1), Owner (26)
             header = (
                 "11" + 
                 "1234" + 
@@ -30,7 +29,6 @@ class TestNorma43Parser(unittest.TestCase):
             f.write(header)
             
             # Transaction (22) - Debit 50.00
-            # 22 (2), Free (4), Branch (4), OpDate (6), ValDate (6), Common (2), Own (3), Sign (1), Amt (14), Doc (10), Ref1 (12), Ref2 (16)
             tx1 = (
                 "22" + 
                 "    " + 
@@ -48,7 +46,6 @@ class TestNorma43Parser(unittest.TestCase):
             f.write(tx1)
             
             # Complementary (23)
-            # 23 (2), Subcode (2), Concept1 (38), Concept2 (38)
             comp1 = (
                 "23" + 
                 "01" + 
@@ -76,7 +73,6 @@ class TestNorma43Parser(unittest.TestCase):
             f.write(tx2)
             
             # Footer (33)
-            # 33 (2), Bank (4), Branch (4), Acc (10), NumDeb (5), TotDeb (14), NumCred (5), TotCred (14), Sign (1), FinBal (14), Curr (3), Free (4)
             footer = (
                 "33" + 
                 "1234" + 
@@ -93,7 +89,6 @@ class TestNorma43Parser(unittest.TestCase):
             f.write(footer)
             
             # EOF (88)
-            # 88 (2), 9s (18), NumRec (6), Free (54)
             eof = (
                 "88" + 
                 "9" * 18 + 
@@ -112,37 +107,37 @@ class TestNorma43Parser(unittest.TestCase):
         accounts = parser.parse()
         self.assertEqual(len(accounts), 1)
         acc = accounts[0]
-        self.assertEqual(acc['bank'], '1234')
-        self.assertEqual(acc['branch'], '5678')
-        self.assertEqual(acc['owner'], 'TEST USER')
-        self.assertEqual(acc['initial_balance'], Decimal('100.00'))
-        self.assertEqual(acc['currency'], '978')
+        self.assertEqual(acc.bank, '1234')
+        self.assertEqual(acc.branch, '5678')
+        self.assertEqual(acc.owner, 'TEST USER')
+        self.assertEqual(acc.initial_balance, Decimal('100.00'))
+        self.assertEqual(acc.currency, '978')
 
     def test_parse_transactions(self):
         parser = Norma43Parser(self.test_file)
         accounts = parser.parse()
-        txs = accounts[0]['transactions']
+        txs = accounts[0].transactions
         self.assertEqual(len(txs), 2)
         
         # Tx 1: Debit 50.00
-        self.assertEqual(txs[0]['amount'], Decimal('-50.00'))
-        self.assertEqual(txs[0]['date'], datetime.date(2022, 1, 5))
-        self.assertEqual(len(txs[0]['description']), 2)
-        self.assertEqual(txs[0]['description'][0], 'Concept Line 1')
-        self.assertEqual(txs[0]['description'][1], 'Concept Line 2')
+        self.assertEqual(txs[0].amount, Decimal('-50.00'))
+        self.assertEqual(txs[0].date, datetime.date(2022, 1, 5))
+        self.assertEqual(len(txs[0].description), 2)
+        self.assertEqual(txs[0].description[0], 'Concept Line 1')
+        self.assertEqual(txs[0].description[1], 'Concept Line 2')
         
         # Tx 2: Credit 200.00
-        self.assertEqual(txs[1]['amount'], Decimal('200.00'))
+        self.assertEqual(txs[1].amount, Decimal('200.00'))
 
     def test_parse_footer(self):
         parser = Norma43Parser(self.test_file)
         accounts = parser.parse()
         acc = accounts[0]
-        self.assertEqual(acc['num_debits'], 1)
-        self.assertEqual(acc['total_debit'], Decimal('50.00'))
-        self.assertEqual(acc['num_credits'], 1)
-        self.assertEqual(acc['total_credit'], Decimal('200.00'))
-        self.assertEqual(acc['final_balance'], Decimal('250.00'))
+        self.assertEqual(acc.num_debits, 1)
+        self.assertEqual(acc.total_debit, Decimal('50.00'))
+        self.assertEqual(acc.num_credits, 1)
+        self.assertEqual(acc.total_credit, Decimal('200.00'))
+        self.assertEqual(acc.final_balance, Decimal('250.00'))
 
     def test_record_count(self):
         parser = Norma43Parser(self.test_file)
