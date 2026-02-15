@@ -62,12 +62,14 @@ accounts = parser.parse()
 
 # 3. Process the data
 for account in accounts:
-    print(f"🏦 Account: {account['bank']}-{account['branch']}-{account['account_number']}")
-    print(f"👤 Owner: {account['owner']}")
-    print(f"💰 Balance: {account['final_balance']} {account['currency']}")
+    print(f"🏦 Account: {account.bank}-{account.branch}-{account.account_number}")
+    print(f"👤 Owner: {account.owner}")
+    print(f"💰 Balance: {account.final_balance} {account.currency}")
     
-    for tx in account['transactions']:
-        print(f"   📅 {tx['date']} | {tx['amount']:>10} | {tx['description'][0]}")
+    for tx in account.transactions:
+        # Use tx.full_description for all lines joined, or check if tx.description exists
+        desc = tx.description[0] if tx.description else "No description"
+        print(f"   📅 {tx.date} | {tx.amount:>10} | {desc}")
 ```
 
 ## 🖥️ CLI Usage
@@ -77,26 +79,26 @@ This library includes a powerful command-line interface (CLI) for quick file ins
 ### 1. View Summary (Text)
 Ideal for quick verification of file contents.
 ```bash
-python -m norma43.parser statement.n43
+python -m norma43 statement.n43
 ```
 
 ### 2. Convert to JSON
 Export data for use in web apps or NoSQL databases.
 ```bash
-python -m norma43.parser statement.n43 --format json --output data.json
+python -m norma43 statement.n43 --format json --output data.json
 ```
 
 ### 3. Convert to CSV
 Generate spreadsheets for Excel or import into Pandas.
 ```bash
-python -m norma43.parser statement.n43 --format csv --output report.csv
+python -m norma43 statement.n43 --format csv --output report.csv
 ```
 
 ## 📊 Data Structure
 
-The parser returns a structured `List[Dict]` object:
+The parser returns a `List[Account]` where `Account` and its `Transaction` objects are **dataclasses**:
 
-### Account Object
+### Account Object (dataclass)
 | Field | Type | Description |
 |-------|------|-------------|
 | `bank` | `str` | 4-digit Bank Code |
@@ -105,14 +107,16 @@ The parser returns a structured `List[Dict]` object:
 | `initial_balance` | `Decimal` | Balance at start period |
 | `final_balance` | `Decimal` | Balance at end period |
 | `currency` | `str` | ISO 4217 Currency Code (e.g., 978 for EUR) |
+| `transactions` | `List[Transaction]` | List of transaction objects |
 
-### Transaction Object
+### Transaction Object (dataclass)
 | Field | Type | Description |
 |-------|------|-------------|
 | `date` | `date` | Transaction date |
 | `value_date` | `date` | Value date (Fecha valor) |
 | `amount` | `Decimal` | Signed transaction amount |
 | `description` | `List[str]` | Full description lines |
+| `full_description` | `property (str)` | All description lines joined by space |
 | `reference1` | `str` | Primary reference / Document ID |
 
 ## 📋 Supported Records
