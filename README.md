@@ -1,5 +1,6 @@
 # Norma 43 Parser (Python)
 
+[![PyPI version](https://badge.fury.io/py/norma43.svg)](https://badge.fury.io/py/norma43)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)](https://www.python.org/downloads/)
 [![Code Style](https://img.shields.io/badge/code%20style-typed-black)](https://github.com/python/typing)
@@ -32,7 +33,13 @@ Designed for fintech developers, accountants, and financial data analysts who ne
 
 Requires Python 3.7+.
 
-Clone the repository and install directly:
+Install the latest version from PyPI:
+
+```bash
+pip install norma43
+```
+
+Or clone the repository and install directly:
 
 ```bash
 git clone https://github.com/enricopesce/norma43.git
