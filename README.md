@@ -1,23 +1,38 @@
 # Norma 43 Parser (Python)
 
-A robust, dependency-free Python library for parsing **Norma 43** (Cuaderno 43) banking files, the standard format for exchanging bank account statements in Spain.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)](https://www.python.org/downloads/)
+[![Code Style](https://img.shields.io/badge/code%20style-typed-black)](https://github.com/python/typing)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-This parser strictly follows the official specifications defined by the Spanish banking association (AEB), ensuring accuracy for records 11 (Header), 22 (Transactions), 23 (Complementary Info), 33 (Footer), and 88 (End of File).
+**The definitive, zero-dependency Python library for parsing Spanish banking statements in the Norma 43 (Cuaderno 43 / AEB 43) format.**
 
-## Features
+Designed for fintech developers, accountants, and financial data analysts who need a reliable, high-performance tool to automate bank reconciliation and process financial movements from Spanish banks (CaixaBank, BBVA, Santander, Sabadell, etc.).
 
-*   **Complete Standard Support:** Parses all standard record types (11, 22, 23, 33, 88).
-*   **Zero Dependencies:** Built using only Python's standard library.
-*   **Type Hinted:** Fully typed for better IDE support and code quality.
-*   **Robust Date & Amount Parsing:** Correctly handles sign digits and various field formats.
-*   **Multiple Output Formats:** Includes a CLI tool to export data to JSON or CSV.
-*   **Comprehensive Tests:** Unit tested against synthetic data and verified against real-world examples.
+---
 
-## Installation
+## 🚀 Key Features
 
-This library requires Python 3.7 or higher.
+*   **🔒 Complete Compliance:** rigorous implementation of the **AEB (Asociación Española de Banca)** specifications for **Norma 43**.
+*   **⚡ High Performance:** Optimized for processing large files quickly using only Python's standard library. **No external dependencies.**
+*   **🛠️ Developer Ready:** Fully **type-hinted** (PEP 484) for excellent IDE support and error checking.
+*   **✅ Robust Parsing:** Handles common edge cases, including complex sign management (debit/credit) and multi-line concepts (Record 23).
+*   **📦 Multi-Format Export:** Built-in CLI to convert `.n43` files to **JSON** or **CSV** for easy integration with Excel, Pandas, or DataFrames.
 
-You can install it directly from source (until it's published to PyPI):
+## 📖 Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [CLI Usage](#cli-usage)
+- [Data Structure](#data-structure)
+- [Supported Records](#supported-records)
+- [License](#license)
+
+## 📥 Installation
+
+Requires Python 3.7+.
+
+Clone the repository and install directly:
 
 ```bash
 git clone https://github.com/enricopesce/norma43.git
@@ -25,71 +40,88 @@ cd norma43
 pip install .
 ```
 
-## Usage
+## 💻 Quick Start
 
-### As a Library
+Easily integrate Norma 43 parsing into your Python financial applications:
 
 ```python
 from norma43.parser import Norma43Parser
 
-# Initialize the parser with your file path
-parser = Norma43Parser("path/to/file.n43")
+# 1. Initialize the parser
+parser = Norma43Parser("path/to/statement.n43")
 
-# Parse the file
+# 2. Parse the file
 accounts = parser.parse()
 
-# Access the data
+# 3. Process the data
 for account in accounts:
-    print(f"Account: {account['account_number']}")
-    print(f"Owner: {account['owner']}")
-    print(f"Final Balance: {account['final_balance']} {account['currency']}")
+    print(f"🏦 Account: {account['bank']}-{account['branch']}-{account['account_number']}")
+    print(f"👤 Owner: {account['owner']}")
+    print(f"💰 Balance: {account['final_balance']} {account['currency']}")
     
     for tx in account['transactions']:
-        print(f"  Date: {tx['date']} | Amount: {tx['amount']} | Desc: {tx['description']}")
+        print(f"   📅 {tx['date']} | {tx['amount']:>10} | {tx['description'][0]}")
 ```
 
-### CLI Tool
+## 🖥️ CLI Usage
 
-You can use the parser from the command line to inspect files or convert them.
+This library includes a powerful command-line interface (CLI) for quick file inspection and conversion.
 
-**1. Text Summary**
+### 1. View Summary (Text)
+Ideal for quick verification of file contents.
 ```bash
-python -m norma43.parser path/to/file.n43
+python -m norma43.parser statement.n43
 ```
 
-**2. Export to JSON**
+### 2. Convert to JSON
+Export data for use in web apps or NoSQL databases.
 ```bash
-python -m norma43.parser path/to/file.n43 --format json --output export.json
+python -m norma43.parser statement.n43 --format json --output data.json
 ```
 
-**3. Export to CSV**
+### 3. Convert to CSV
+Generate spreadsheets for Excel or import into Pandas.
 ```bash
-python -m norma43.parser path/to/file.n43 --format csv --output export.csv
+python -m norma43.parser statement.n43 --format csv --output report.csv
 ```
 
-## Data Structure
+## 📊 Data Structure
 
-The `parse()` method returns a list of dictionaries, where each dictionary represents a bank account found in the file.
+The parser returns a structured `List[Dict]` object:
 
-**Account Object:**
-*   `bank`, `branch`, `account_number`: Strings identifying the account.
-*   `start_date`, `end_date`: `datetime.date` objects.
-*   `initial_balance`, `final_balance`: `decimal.Decimal` objects.
-*   `owner`: Account holder name.
-*   `currency`: Currency code (e.g., '978' for EUR).
-*   `transactions`: List of transaction objects.
+### Account Object
+| Field | Type | Description |
+|-------|------|-------------|
+| `bank` | `str` | 4-digit Bank Code |
+| `branch` | `str` | 4-digit Branch Code |
+| `account_number` | `str` | 10-digit Account Number |
+| `initial_balance` | `Decimal` | Balance at start period |
+| `final_balance` | `Decimal` | Balance at end period |
+| `currency` | `str` | ISO 4217 Currency Code (e.g., 978 for EUR) |
 
-**Transaction Object:**
-*   `date`, `value_date`: `datetime.date` objects.
-*   `amount`: `decimal.Decimal`.
-*   `description`: List of strings (concatenated from Type 23 records).
-*   `document`, `reference1`, `reference2`: Tracking numbers.
-*   `common_code`, `own_code`: Transaction type codes.
+### Transaction Object
+| Field | Type | Description |
+|-------|------|-------------|
+| `date` | `date` | Transaction date |
+| `value_date` | `date` | Value date (Fecha valor) |
+| `amount` | `Decimal` | Signed transaction amount |
+| `description` | `List[str]` | Full description lines |
+| `reference1` | `str` | Primary reference / Document ID |
 
-## License
+## 📋 Supported Records
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+| Record | Type | Status | Description |
+|:------:|:-----|:------:|:------------|
+| **11** | Header | ✅ | Account identification and initial balance |
+| **22** | Transaction | ✅ | Main movement details (Date, Amount, IDs) |
+| **23** | Complementary | ✅ | Extended concepts and descriptions |
+| **33** | Footer | ✅ | Account final balance and totals verification |
+| **88** | End of File | ✅ | File integrity check |
 
-## Contributing
+## ⚖️ License
 
-Contributions are welcome! Please ensure that any changes include updated unit tests in the `tests/` directory.
+Distributed under the **Apache License 2.0**. See [LICENSE](LICENSE) for more information.
+
+---
+
+**Keywords:** *Norma 43, Cuaderno 43, CSB 43, AEB 43, Conciliación Bancaria, Bank Reconciliation, Spanish Banking Standard, Python Parser, Finance, Fintech, Open Banking.*

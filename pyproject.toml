@@ -5,22 +5,40 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "norma43"
 version = "0.1.0"
-description = "A Python library to parse Norma 43 banking files (Spanish standard)."
+description = "High-performance Python parser for Norma 43 (Cuaderno 43 / AEB 43) Spanish banking files. Open-source, type-hinted, and dependency-free."
 authors = [
     {name = "Enrico Pesce", email = "enrico.pesce@example.com"},
 ]
 readme = "README.md"
 license = {text = "Apache-2.0"}
+keywords = [
+    "norma43", "cuaderno43", "csb43", "aeb43", "n43", 
+    "banking", "finance", "fintech", "spain", "conciliation", 
+    "bank-statement", "parser", "python", "financial-data"
+]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: OS Independent",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Office/Business :: Financial",
+    "Topic :: Office/Business :: Financial :: Accounting",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
 ]
 requires-python = ">=3.7"
 
 [project.urls]
 "Homepage" = "https://github.com/enricopesce/norma43"
+"Repository" = "https://github.com/enricopesce/norma43"
 "Bug Tracker" = "https://github.com/enricopesce/norma43/issues"
+"Documentation" = "https://github.com/enricopesce/norma43#readme"
