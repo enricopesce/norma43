@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "norma43"
-version = "0.1.3"
+version = "0.1.4"
 description = "High-performance Python parser for Norma 43 (Cuaderno 43 / AEB 43) Spanish banking files. Open-source, type-hinted, and dependency-free."
 authors = [
     {name = "Enrico Pesce", email = "enrico.pesce@example.com"},
